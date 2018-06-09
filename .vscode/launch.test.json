@@ -1,0 +1,28 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "ass2",
+                "projectName": "ass2",
+                "workingDirectory": "/Users/david/Repos/COS20012/ass2",
+                "args": [],
+                "vmargs": [],
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "ass2",
+                "projectName": "ass2",
+                "workingDirectory": "/Users/david/Repos/COS20012/ass2",
+                "args": [],
+                "vmargs": [],
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}
