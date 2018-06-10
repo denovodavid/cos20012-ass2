@@ -128,7 +128,7 @@ public class Comms
                 stringRead.append((char)inInt);
                 // i++;
              } while ( inInt != 10) ;
-             System.out.println("stringRead.length: " + stringRead.length());
+            //  System.out.println("stringRead.length: " + stringRead.length());
              return stringRead;
      }
 

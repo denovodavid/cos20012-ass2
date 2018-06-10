@@ -42,15 +42,15 @@ public class ReliableDataTransfer {
       // remove line end
       frameString = frameString.substring(0, frameString.length() - 1);
 
-      System.out.println("ReadFrameLn: " + frameString);
+      // System.out.println("ReadFrameLn: " + frameString);
 
       // return parsed frame
       frame = Frame.parse(frameString);
 
       // System.out.println("FRAMEWORK: " + frameString.equals(frame.toString()));
-      System.out.println("FCS: " + frame.fcs);
-      System.out.println("CHK: " + frame.calulateChecksum());
-      System.out.println("isCorrupt: " + frame.isCorrupt());
+      // System.out.println("FCS: " + frame.fcs);
+      // System.out.println("CHK: " + frame.calulateChecksum());
+      // System.out.println("isCorrupt: " + frame.isCorrupt());
       // String testy = String.valueOf(frame.dataBlock);
       // for (int i = 0, n = testy.length(); i < n; i++) {
       //   System.out.println("Char " + i + ": " + (int) testy.charAt(i));
@@ -59,6 +59,8 @@ public class ReliableDataTransfer {
       // System.out.println(frame);
 
       // System.out.println(frame.getData());
+
+      if (frame.isCorrupt()) System.out.println("CORRUPT");
 
       if (sendAck)
         sendAck(frame);
@@ -79,7 +81,7 @@ public class ReliableDataTransfer {
     String frameString = ack.toString();
     // System.out.println("isAck: " + ack.isAck(frame.frameNo, frame.fcs));
     // System.out.println("isCorrupt: " + ack.isCorrupt());
-    System.out.println("Send Ack: " + frame.frameNo);
+    // System.out.println("Send Ack: " + frame.frameNo);
     // for (int i = 0, n = frameString.length(); i < n; i++) {
     //   System.out.println("AckChar " + i + ": " + (int) frameString.charAt(i));
     // }
@@ -149,15 +151,16 @@ public class ReliableDataTransfer {
     // remove any line breaks, because it messes up comms >:(
     data = data.replace('\n', ' ');
 
-    System.out.println("Data: " + data);
+    // System.out.println("Data: " + data);
 
     Frame frame = new Frame(frameNo, data.toCharArray());
     String frameString = frame.toString();
 
-    System.out.println("Frame: " + frameString);
+    // System.out.println("Frame: " + frameString);
 
-    System.out.println("FCS: " + frame.fcs);
-    System.out.println("CHK: " + frame.calulateChecksum());
+    // System.out.println("FCS: " + frame.fcs);
+    // System.out.println("CHK: " + frame.calulateChecksum());
+
     // String testy = String.valueOf(frame.dataBlock);
     // for (int i = 0, n = testy.length(); i < n; i++) {
     //   System.out.println("Char " + i + ": " + (int) testy.charAt(i));
@@ -165,83 +168,42 @@ public class ReliableDataTransfer {
 
     if (reqAck) {
       myLoop: while (true) {
-        // https://stackoverflow.com/questions/1164301/how-do-i-call-some-blocking-method-with-a-timeout-in-java
-        // ExecutorService executor = Executors.newSingleThreadExecutor();
-        // Callable<Frame> getAckTask = new Callable<Frame>() {
-        //   public Frame call() throws Exception {
-        //     while (true) {
-        //       String ackString = comms.readString().toString();
-        //       System.out.println("ACK READ!");
-
-        //       // System.out.println("ReadFrame: " + frameString);
-
-        //       for (int i = 0, n = ackString.length(); i < n; i++) {
-        //         System.out.println("AckChar " + i + ": " + (int) ackString.charAt(i));
-        //       }
-
-        //       // remove line end
-        //       ackString = ackString.substring(0, ackString.length() - 1);
-
-        //       // System.out.println("ReadFrameLn: " + frameString);
-
-        //       // return parsed frame
-        //       Frame ack = Frame.parse(ackString);
-        //       System.out.println("isAck: " + ack.isAck(frameNo, frame.fcs));
-        //       System.out.println("isCorrupt: " + ack.isCorrupt());
-        //       if (ack.isAck(frameNo, frame.fcs) && !ack.isCorrupt()) {
-        //         System.out.println("RETURN ACK");
-        //         return ack;
-        //       }
-        //     }
-        //   }
-        // };
         comms.writeString(frameString);
         System.out.println("Sent and waiting for response " + frameNo + "...");
-        // Frame thing = readFrame(false);
-        // System.out.println("ACK: " + (int) thing.getData().charAt(0));
-        // System.out.println("isAck: " + thing.isAck(frameNo));
-        // System.out.println("isCorrupt: " + thing.isCorrupt());
-        // break;
-        // Future<Frame> futureAck = executor.submit(getAckTask);
-        Future<String> futureAckString = executor.submit(readStringTask);
-        try {
-          // Frame ack = futureAck.get(2, TimeUnit.SECONDS);
-          String ackString = futureAckString.get(500, TimeUnit.MILLISECONDS);
-          System.out.println("ACK READ!");
 
-          // System.out.println("ReadFrame: " + frameString);
+        long endTime = System.currentTimeMillis() + 50;
+        while (true) {
+          if (comms.available()) {
+            String ackString = comms.readString().toString();
+            // System.out.println("ACK READ!");
 
-          // for (int i = 0, n = ackString.length(); i < n; i++) {
-          //   System.out.println("AckChar " + i + ": " + (int) ackString.charAt(i));
-          // }
+            // System.out.println("ReadFrame: " + frameString);
 
-          // remove line end
-          ackString = ackString.substring(0, ackString.length() - 1);
+            // for (int i = 0, n = ackString.length(); i < n; i++) {
+            //   System.out.println("AckChar " + i + ": " + (int) ackString.charAt(i));
+            // }
 
-          // System.out.println("ReadFrameLn: " + frameString);
+            // remove line end
+            ackString = ackString.substring(0, ackString.length() - 1);
 
-          // return parsed frame
-          Frame ack = Frame.parse(ackString);
-          System.out.println("isAck: " + ack.isAck(frameNo, frame.fcs));
-          System.out.println("isCorrupt: " + ack.isCorrupt());
-          if (ack.isAck(frameNo, frame.fcs) && !ack.isCorrupt()) {
-            System.out.println("BREAK LOOP");
-            break myLoop;
+            // System.out.println("ReadFrameLn: " + frameString);
+
+            // return parsed frame
+            Frame ack = Frame.parse(ackString);
+            // System.out.println("isAck: " + ack.isAck(frameNo, frame.fcs));
+            // System.out.println("isCorrupt: " + ack.isCorrupt());
+            if (ack.isAck(frameNo, frame.fcs) && !ack.isCorrupt()) {
+              // System.out.println("CONFIRMED ACK");
+              break myLoop;
+            }
           }
-          // System.out.println("isAck: " + ack.isAck(frameNo, frame.fcs));
-          // System.out.println("isCorrupt: " + ack.isCorrupt());
-          // if (ack.isAck(frameNo, frame.fcs) && !ack.isCorrupt())
-          //   break;
-        } catch (Exception e) {
-          // continue;
-        } finally {
-          System.out.println("isDone: " + futureAckString.isDone());
-          System.out.println("isCancelled: " + futureAckString.cancel(true));
+          if (System.currentTimeMillis() > endTime) {
+            System.out.println("TIMEOUT");
+            break;
+          }
         }
-        // executor.shutdownNow();
       }
       frameNo = frameNo == 0 ? (byte) 1 : 0;
-      // frameNo = ~frameNo; // TODO: try dis
     } else {
       comms.writeString(frameString);
     }

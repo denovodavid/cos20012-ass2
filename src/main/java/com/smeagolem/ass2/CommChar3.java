@@ -48,7 +48,7 @@ public class CommChar3
         while ((c = fileStream.read()) != -1) {
           if (i == 50 || c == '\n')
           {
-            System.out.println(buffer);
+            // System.out.println(buffer);
             // String frameString = (new Frame((byte) frameNo, buffer)).toString();
             // System.out.println("Frame " + frameNo + ": " + frameString);
             rdt.writeData(String.valueOf(buffer));
@@ -121,7 +121,8 @@ public class CommChar3
           state = 2;
         } else if (state == 1) {
           // TODO: save to file
-          System.out.println("File data: " + resData);
+          // System.out.println("File data: " + resData);
+          System.out.println(resData);
         }
       }
     }
