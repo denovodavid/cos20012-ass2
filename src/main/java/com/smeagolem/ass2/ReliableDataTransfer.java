@@ -1,11 +1,5 @@
 package com.smeagolem.ass2;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 /**
  * ReliableDataTransfer
  */
@@ -14,18 +8,9 @@ public class ReliableDataTransfer {
   private final Comms comms;
   private byte frameNo = 0;
   private byte lastReadFrameNo = -1;
-  private final ExecutorService executor;
-  private final Callable<String> readStringTask;
 
   public ReliableDataTransfer(final Comms comms) {
     this.comms = comms;
-    executor = Executors.newCachedThreadPool();
-    readStringTask = new Callable<String>() {
-      public String call() throws Exception {
-        System.out.println("Read String!");
-        return comms.readString().toString();
-      }
-    };
   }
 
   public Frame readFrame(boolean sendAck) throws Exception {
